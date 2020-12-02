@@ -1,0 +1,11 @@
+#!/bin/bash
+
+cd Geometrics
+./dep
+cd ../Img
+./dep
+cd ../Pointer
+./dep
+cd ..
+
+echo "Finished."

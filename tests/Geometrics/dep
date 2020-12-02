@@ -1,0 +1,27 @@
+#!/bin/bash
+
+GIT="--branch v201908 https://github.com/dedeme/dmhxlib.git"
+
+if [ ! -e lib ]
+then
+  mkdir lib
+fi
+cd lib
+
+if [ -e tmp ]
+then
+  rm -fR tmp
+fi
+mkdir tmp
+cd tmp
+git clone $GIT
+cd ..
+
+if [ -e dm ]
+then
+  rm -fR dm
+fi
+mv tmp/dmhxlib/src/dm dm
+rm -fR tmp
+
+

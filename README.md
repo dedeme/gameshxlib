@@ -1,2 +1,2 @@
 # gameshxlib
-Games utilities
+Game utilities
