@@ -5,6 +5,7 @@ package dm;
 
 import js.html.DragEvent;
 import js.html.MouseEvent;
+import js.html.CanvasElement;
 import js.html.ImageElement;
 
 class Sprite {
@@ -17,42 +18,51 @@ class Sprite {
   var dragMoves: Array<MouseEvent -> Bool> = [];
   var drops: Array<MouseEvent -> Void> = [];
 
-  public var image(default, null): ImageElement;
+  public var canvas(default, null): CanvasElement;
   public var board(default, null): Board;
   /// Default 1000.
   public var zindex(get, never): Int;
-  function get_zindex () { return Std.parseInt(image.style.zIndex); }
+  function get_zindex () { return Std.parseInt(canvas.style.zIndex); }
   public var draggable(default, null): Bool;
   public var added(default, null) = false;
 
   public function new (board: Board, img: ImageElement, draggable = false) {
     this.board = board;
-    image = img;
-    image.style.setProperty("display", "block");
-    image.style.setProperty("position", "absolute");
-    image.style.setProperty("z-index", "1000");
-    image.style.setProperty("transition-property", "transform");
-    image.style.setProperty("transition-timing-function", "ease-out");
+    canvas =
+      cast(js.Browser.document.createElement("canvas"), CanvasElement);
+    canvas.width = img.width;
+    canvas.height = img.height;
+    canvas.getContext2d().drawImage(
+      img, 0, 0, img.width, img.height, 0, 0, img.width, img.height
+    );
+
+    canvas.style.setProperty("display", "block");
+    canvas.style.setProperty("position", "absolute");
+    canvas.style.setProperty("z-index", "1000");
+    canvas.style.setProperty("transition-property", "transform");
+    canvas.style.setProperty("transition-timing-function", "ease-out");
     setDraggable(draggable);
   }
 
   public function put (x: Int, y: Int): Sprite {
-    image.style.left = x + "px";
-    image.style.top = y + "px";
-    board.addImage(image);
+    canvas.style.left = x + "px";
+    canvas.style.top = y + "px";
+    board.addCanvas(canvas);
     added = true;
     return this;
   }
 
   public function moveTo (x: Int, y: Int, time: Int): Sprite {
-    final cx = image.style.left != null ? Std.parseInt(image.style.left) : 0;
-    final cy = image.style.top != null ? Std.parseInt(image.style.top) : 0;
-    image.style.setProperty("transform", 'translate(${x - cx}px, ${y - cy}px)');
-    image.style.setProperty("transition-duration", '${time}ms');
+    final cx = canvas.style.left != null ? Std.parseInt(canvas.style.left) : 0;
+    final cy = canvas.style.top != null ? Std.parseInt(canvas.style.top) : 0;
+    canvas.style.setProperty(
+      "transform", 'translate(${x - cx}px, ${y - cy}px)'
+    );
+    canvas.style.setProperty("transition-duration", '${time}ms');
     haxe.Timer.delay(() -> {
         put(x, y);
-        image.style.removeProperty("transition-duration");
-        image.style.removeProperty("transform");
+        canvas.style.removeProperty("transition-duration");
+        canvas.style.removeProperty("transform");
       },
       time + 50
     );
@@ -60,13 +70,13 @@ class Sprite {
   }
 
   public function quit (): Sprite {
-    board.removeImage(image);
+    board.removeCanvas(canvas);
     added = false;
     return this;
   }
 
   public function setZorder(o: Int): Sprite {
-    image.style.setProperty("z-index", Std.string(o));
+    canvas.style.setProperty("z-index", Std.string(o));
     return this;
   }
 
@@ -82,11 +92,11 @@ class Sprite {
 
       var rel = Pointer.relative(absCorner, board.canvas);
       if (rel.x < 0) rel = new Point(0, rel.y);
-      if (rel.x + image.width > board.width)
-        rel = new Point(board.width - image.width, rel.y);
+      if (rel.x + canvas.width > board.width)
+        rel = new Point(board.width - canvas.width, rel.y);
       if (rel.y < 0) rel = new Point(rel.x, 0);
-      if (rel.y + image.height > board.height)
-        rel = new Point(rel.x, board.height - image.height);
+      if (rel.y + canvas.height > board.height)
+        rel = new Point(rel.x, board.height - canvas.height);
 
       put(rel.x, rel.y);
     }
@@ -142,7 +152,7 @@ class Sprite {
       addMouseUp(fnUp);
       addMouseOut(fnOut);
       final abs = Pointer.absolute(ev);
-      dragInc = Pointer.relative(abs, image);
+      dragInc = Pointer.relative(abs, canvas);
     }
 
     addMouseDown(fnDown);
@@ -208,62 +218,62 @@ class Sprite {
   }
 
   public function addClick (fn: MouseEvent -> Void): Sprite {
-    image.addEventListener("click", fn);
+    canvas.addEventListener("click", fn);
     return this;
   }
 
   public function removeClick (fn: MouseEvent -> Void): Sprite {
-    image.removeEventListener("click", fn);
+    canvas.removeEventListener("click", fn);
     return this;
   }
 
   public function addDblClick (fn: MouseEvent -> Void): Sprite {
-    image.addEventListener("dblclick", fn);
+    canvas.addEventListener("dblclick", fn);
     return this;
   }
 
   public function removeDblClick (fn: MouseEvent -> Void): Sprite {
-    image.removeEventListener("dblclick", fn);
+    canvas.removeEventListener("dblclick", fn);
     return this;
   }
 
   public function addMouseDown (fn: MouseEvent -> Void): Sprite {
-    image.addEventListener("mousedown", fn);
+    canvas.addEventListener("mousedown", fn);
     return this;
   }
 
   public function removeMouseDown (fn: MouseEvent -> Void): Sprite {
-    image.removeEventListener("mousedown", fn);
+    canvas.removeEventListener("mousedown", fn);
     return this;
   }
 
   public function addMouseUp (fn: MouseEvent -> Void): Sprite {
-    image.addEventListener("mouseup", fn);
+    canvas.addEventListener("mouseup", fn);
     return this;
   }
 
   public function removeMouseUp (fn: MouseEvent -> Void): Sprite {
-    image.removeEventListener("mouseup", fn);
+    canvas.removeEventListener("mouseup", fn);
     return this;
   }
 
   public function addMouseMove (fn: MouseEvent -> Void): Sprite {
-    image.addEventListener("mousemove", fn);
+    canvas.addEventListener("mousemove", fn);
     return this;
   }
 
   public function removeMouseMove (fn: MouseEvent -> Void): Sprite {
-    image.removeEventListener("mousemove", fn);
+    canvas.removeEventListener("mousemove", fn);
     return this;
   }
 
   public function addMouseOut (fn: MouseEvent -> Void): Sprite {
-    image.addEventListener("mouseout", fn);
+    canvas.addEventListener("mouseout", fn);
     return this;
   }
 
   public function removeMouseOut (fn: MouseEvent -> Void): Sprite {
-    image.removeEventListener("mouseout", fn);
+    canvas.removeEventListener("mouseout", fn);
     return this;
   }
 

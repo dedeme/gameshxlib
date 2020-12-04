@@ -53,15 +53,15 @@ class Board {
   }
 
   /// Draws a background image.
-  public function drawBackgroundFrom (img: CanvasElement, x = 0, y = 0): Board {
+  public function drawBackgroundFrom (cv: CanvasElement, x = 0, y = 0): Board {
     if (withImage) {
       canvas.getContext2d().clearRect(0, 0, width, height);
     }
 
     withImage = true;
     canvas.getContext2d().drawImage(
-      img, 0, 0, img.width, img.height,
-      x, y, img.width, img.height
+      cv, 0, 0, cv.width, cv.height,
+      x, y, cv.width, cv.height
     );
     return this;
   }
@@ -93,14 +93,14 @@ class Board {
   }
 
   /// Adds an image.
-  public function addImage (img: ImageElement): Board {
-    wg.appendChild(img);
+  public function addCanvas (cv: CanvasElement): Board {
+    wg.appendChild(cv);
     return this;
   }
 
   /// Removes an image.
-  public function removeImage (img: ImageElement): Board {
-    wg.appendChild(img);
+  public function removeCanvas (cv: CanvasElement): Board {
+    wg.removeChild(cv);
     return this;
   }
 
