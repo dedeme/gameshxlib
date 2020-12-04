@@ -54,7 +54,7 @@ class Main {
       .addClick(click)
     ;
 
-    final sp = new Sprite(bd, isp)
+    final sp = Sprite.fromImage(bd, isp)
       .put(30, 30)
       .addClick(e -> { e.preventDefault; e.stopPropagation(); })
       .setDraggable(true)
@@ -64,7 +64,7 @@ class Main {
     ;
 
     var sp2: Sprite = null;
-    sp2 = new Sprite(bd, isp2)
+    sp2 = Sprite.fromImage(bd, isp2)
       .put(200, 200)
       .addClick(e -> { e.preventDefault; e.stopPropagation(); })
       .setDraggable(true)

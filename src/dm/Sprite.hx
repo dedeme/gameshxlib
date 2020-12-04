@@ -8,7 +8,24 @@ import js.html.MouseEvent;
 import js.html.CanvasElement;
 import js.html.ImageElement;
 
+/// Canvas element draggable to use on a Board.
 class Sprite {
+
+  public static function fromImage (
+    board: Board, img: ImageElement, draggable = false
+  ): Sprite {
+    final canvas =
+      cast(js.Browser.document.createElement("canvas"), CanvasElement);
+    canvas.width = img.width;
+    canvas.height = img.height;
+    canvas.getContext2d().drawImage(
+      img, 0, 0, img.width, img.height, 0, 0, img.width, img.height
+    );
+    return new Sprite(board, canvas, draggable);
+  }
+
+  // Object --------------------------------------------------------------------
+
   var fnDown: MouseEvent -> Void;
   var fnMove: MouseEvent -> Void;
   var fnUp: MouseEvent -> Void;
@@ -26,15 +43,9 @@ class Sprite {
   public var draggable(default, null): Bool;
   public var added(default, null) = false;
 
-  public function new (board: Board, img: ImageElement, draggable = false) {
+  public function new (board: Board, canvas: CanvasElement, draggable = false) {
     this.board = board;
-    canvas =
-      cast(js.Browser.document.createElement("canvas"), CanvasElement);
-    canvas.width = img.width;
-    canvas.height = img.height;
-    canvas.getContext2d().drawImage(
-      img, 0, 0, img.width, img.height, 0, 0, img.width, img.height
-    );
+    this.canvas = canvas;
 
     canvas.style.setProperty("display", "block");
     canvas.style.setProperty("position", "absolute");
