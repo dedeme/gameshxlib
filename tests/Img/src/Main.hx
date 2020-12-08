@@ -59,9 +59,12 @@ class Main {
       .addClick(e -> { e.preventDefault; e.stopPropagation(); })
       .setDraggable(true)
       .addDragStart(e -> { trace("Drag start"); return true; })
-      .addDragMove(e -> { trace("Drag move"); return true; })
+      .addDragMove(e -> { trace("Drag move - " + e.clientX); return true; })
       .addDrop(e -> { trace("Drag stop"); })
+      .addMouseDown(e -> {})
+      .addBlank(new Rectangle(0, 0, 50, 50))
     ;
+    sp.canvas.getContext2d().clearRect(0, 0, 30, 30);
 
     var sp2: Sprite = null;
     sp2 = Sprite.fromImage(bd, isp2)
@@ -72,11 +75,24 @@ class Main {
           trace("Drag2 start - Drag & Drop stoped");
           sp2.moveTo(0, 0, 350)
             .removeAllDragStarts()
+            .addDragMove(e -> { trace("Drag move - " + e.clientX); return true; })
             .addDrop(e -> sp2.moveTo(0, 0, 350))
           ;
           return false;
         })
     ;
+    sp.addMouseDown(e -> {
+      final abs = Pointer.absolute(e);
+      final cv = sp2.canvas;
+      if (sp.inBlank(abs)) {
+        if (Pointer.bounds(cv).contains(abs)) {
+          final rel = Pointer.relative(abs, cv);
+          cv.dispatchEvent(new js.html.MouseEvent(
+            "mousedown", Pointer.copyEvent(e)
+          ));
+        }
+      }
+    });
 
     bd2 = new Board(45, 26)
       .setBackground("#400000")

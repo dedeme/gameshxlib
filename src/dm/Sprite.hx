@@ -11,6 +11,10 @@ import js.html.ImageElement;
 /// Canvas element draggable to use on a Board.
 class Sprite {
 
+  /// Constructor from image.
+  ///   board    : Board of sprite.
+  ///   img      : Image of sprite.
+  ///   draggable: 'true' if sprite is draggable.
   public static function fromImage (
     board: Board, img: ImageElement, draggable = false
   ): Sprite {
@@ -26,6 +30,8 @@ class Sprite {
 
   // Object --------------------------------------------------------------------
 
+  // Dragging insensitive areas.
+  var blanks: Array<Rectangle> = [];
   var fnDown: MouseEvent -> Void;
   var fnMove: MouseEvent -> Void;
   var fnUp: MouseEvent -> Void;
@@ -41,8 +47,13 @@ class Sprite {
   public var zindex(get, never): Int;
   function get_zindex () { return Std.parseInt(canvas.style.zIndex); }
   public var draggable(default, null): Bool;
+  /// Returns 'true' if 'this' was added to this.board.
   public var added(default, null) = false;
 
+  /// Constructor.
+  ///   board    : Board of sprite.
+  ///   canvas   : Image of sprite.
+  ///   draggable: 'true' if sprite is draggable.
   public function new (board: Board, canvas: CanvasElement, draggable = false) {
     this.board = board;
     this.canvas = canvas;
@@ -55,6 +66,31 @@ class Sprite {
     setDraggable(draggable);
   }
 
+  /// Adds an insesitive area.
+  /// An insensitive area does not respond to 'drag and drop'.
+  public function addBlank (area: Rectangle): Sprite {
+    blanks.push(area);
+    return this;
+  }
+
+  /// Remove every insensitive area.
+  public function clearBlanks (): Sprite {
+    blanks = [];
+    return this;
+  }
+
+  /// Returns thrue if 'abs' is in a blank.
+  ///   abs: Result of 'Pointer.absolute()'
+  public function inBlank (abs: Point): Bool {
+    for (b in blanks) {
+      if (b.contains(Pointer.relative(abs, canvas))) return true;
+    }
+    return false;
+  }
+
+  /// Puts a sprite in its board.
+  ///   x: Coordinate x.
+  ///   y: Coordinate y.
   public function put (x: Int, y: Int): Sprite {
     canvas.style.left = x + "px";
     canvas.style.top = y + "px";
@@ -63,6 +99,10 @@ class Sprite {
     return this;
   }
 
+  /// Puts 'this' in its board with an animation.
+  ///   x   : Coordinate x.
+  ///   y   : Coordinate y.
+  ///   time: Animation time in milliseconds.
   public function moveTo (x: Int, y: Int, time: Int): Sprite {
     final cx = canvas.style.left != null ? Std.parseInt(canvas.style.left) : 0;
     final cy = canvas.style.top != null ? Std.parseInt(canvas.style.top) : 0;
@@ -80,17 +120,20 @@ class Sprite {
     return this;
   }
 
+  /// Remove 'this' from its board.
   public function quit (): Sprite {
     board.removeCanvas(canvas);
     added = false;
     return this;
   }
 
-  public function setZorder(o: Int): Sprite {
+  /// Sets the axis x index
+  public function setZindex(o: Int): Sprite {
     canvas.style.setProperty("z-index", Std.string(o));
     return this;
   }
 
+  /// Sets if 'this' is draggable.
   public function setDraggable (value: Bool): Sprite {
     if (value == false) {
       if (fnDown != null) removeMouseDown(fnDown);
@@ -98,7 +141,6 @@ class Sprite {
     }
 
     function fnPut (abs: Point) {
-
       final absCorner = new Point(abs.x - dragInc.x, abs.y - dragInc.y);
 
       var rel = Pointer.relative(absCorner, board.canvas);
@@ -154,16 +196,20 @@ class Sprite {
     }
 
     fnDown = ev -> {
+      final abs = Pointer.absolute(ev);
+      dragInc = Pointer.relative(abs, canvas);
+      for (b in blanks) {
+        if (b.contains(dragInc)) return;
+      }
       ev.stopPropagation();
       ev.preventDefault();
       for (fn in dragStarts) {
         if (!fn(ev)) return;
       }
+      fnPut(abs);
       addMouseMove(fnMove);
       addMouseUp(fnUp);
       addMouseOut(fnOut);
-      final abs = Pointer.absolute(ev);
-      dragInc = Pointer.relative(abs, canvas);
     }
 
     addMouseDown(fnDown);
