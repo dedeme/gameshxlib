@@ -30,6 +30,11 @@ class Sprite {
 
   // Object --------------------------------------------------------------------
 
+  var boundx: Int;
+  var boundy: Int;
+  var boundx2: Int;
+  var boundy2: Int;
+
   // Dragging insensitive areas.
   var blanks: Array<Rectangle> = [];
   var fnDown: MouseEvent -> Void;
@@ -57,6 +62,12 @@ class Sprite {
   public function new (board: Board, canvas: CanvasElement, draggable = false) {
     this.board = board;
     this.canvas = canvas;
+    final w2 = Std.int(canvas.width / 2);
+    final h2 = Std.int(canvas.height / 2);
+    boundx = -w2;
+    boundy = -h2;
+    boundx2 = board.canvas.width - w2;
+    boundy2 = board.canvas.height - h2;
 
     canvas.style.setProperty("display", "block");
     canvas.style.setProperty("position", "absolute");
@@ -144,12 +155,10 @@ class Sprite {
       final absCorner = new Point(abs.x - dragInc.x, abs.y - dragInc.y);
 
       var rel = Pointer.relative(absCorner, board.canvas);
-      if (rel.x < 0) rel = new Point(0, rel.y);
-      if (rel.x + canvas.width > board.width)
-        rel = new Point(board.width - canvas.width, rel.y);
-      if (rel.y < 0) rel = new Point(rel.x, 0);
-      if (rel.y + canvas.height > board.height)
-        rel = new Point(rel.x, board.height - canvas.height);
+      if (rel.x < boundx) rel = new Point(boundx, rel.y);
+      if (rel.x > boundx2) rel = new Point(boundx2, rel.y);
+      if (rel.y < boundy) rel = new Point(rel.x, boundy);
+      if (rel.y > boundy2) rel = new Point(rel.x, boundy2);
 
       put(rel.x, rel.y);
     }
