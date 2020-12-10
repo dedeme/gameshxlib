@@ -30,10 +30,17 @@ class Pointer {
   }
 
   /// Returns the position of mouse in document.
-  ///   ev: Mouse event.
-  public static function absolute (ev: MouseEvent): Point {
+  ///   ev: MouseEvent or TouchEvent.
+  public static function absolute (ev: Dynamic): Point {
     final sc = docScroll();
-    return new Point(ev.clientX + sc.x, ev.clientY + sc.y);
+    try {
+      final tev = cast(ev, js.html.TouchEvent);
+      final x = tev.changedTouches[0].clientX;
+      final y = tev.changedTouches[0].clientY;
+      return new Point(x + sc.x, y + sc.y);
+    } catch (e) {
+      return new Point(ev.clientX + sc.x, ev.clientY + sc.y);
+    }
   }
 
   /// Returns the position of mouse in an element.

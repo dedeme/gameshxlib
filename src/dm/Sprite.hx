@@ -305,31 +305,37 @@ class Sprite {
 
   public function addMouseDown (fn: MouseEvent -> Void): Sprite {
     canvas.addEventListener("mousedown", fn);
+    canvas.addEventListener("touchstart", fn);
     return this;
   }
 
   public function removeMouseDown (fn: MouseEvent -> Void): Sprite {
     canvas.removeEventListener("mousedown", fn);
+    canvas.removeEventListener("touchstart", fn);
     return this;
   }
 
   public function addMouseUp (fn: MouseEvent -> Void): Sprite {
     canvas.addEventListener("mouseup", fn);
+    canvas.addEventListener("touchend", fn);
     return this;
   }
 
   public function removeMouseUp (fn: MouseEvent -> Void): Sprite {
     canvas.removeEventListener("mouseup", fn);
+    canvas.removeEventListener("touchend", fn);
     return this;
   }
 
   public function addMouseMove (fn: MouseEvent -> Void): Sprite {
     canvas.addEventListener("mousemove", fn);
+    canvas.addEventListener("touchmove", fn);
     return this;
   }
 
   public function removeMouseMove (fn: MouseEvent -> Void): Sprite {
     canvas.removeEventListener("mousemove", fn);
+    canvas.addEventListener("touchmove", fn);
     return this;
   }
 
