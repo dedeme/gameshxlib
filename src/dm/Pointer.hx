@@ -6,6 +6,8 @@ package dm;
 import js.html.DOMElement;
 import js.html.MouseEvent;
 import js.html.MouseEventInit;
+import js.html.TouchEvent;
+import js.html.TouchEventInit;
 
 /// Positions in screen.
 class Pointer {
@@ -79,4 +81,33 @@ class Pointer {
       cancelable: ev.cancelable
     };
   }
+
+  /// Copies touch event parameters.
+  public static function copyTouchEvent (ev: TouchEvent): TouchEventInit {
+    return {
+      altKey: ev.altKey,
+      touches: ev.touches == null
+        ? null
+        : It.range(ev.touches.length).map(i -> ev.touches.item(i)).to(),
+      targetTouches: ev.targetTouches == null
+        ? null
+        : It.range(ev.targetTouches.length).map(
+            i -> ev.targetTouches.item(i)
+          ).to(),
+      changedTouches: ev.changedTouches == null
+        ? null
+        : It.range(ev.changedTouches.length).map(
+            i -> ev.changedTouches.item(i)
+          ).to(),
+      ctrlKey: ev.ctrlKey,
+      metaKey: ev.metaKey,
+      shiftKey: ev.shiftKey,
+      bubbles: ev.bubbles,
+      composed: ev.composed,
+      view: ev.view,
+      detail: ev.detail,
+      cancelable: ev.cancelable
+    };
+  }
+
 }
