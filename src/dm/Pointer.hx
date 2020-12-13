@@ -25,7 +25,8 @@ class Pointer {
     final sc = docScroll();
     final bs = e.getBoundingClientRect();
     return new Rectangle(
-      Std.int(bs.left), Std.int(bs.top), Std.int(bs.width), Std.int(bs.height)
+      Std.int(bs.left) + sc.x, Std.int(bs.top) + sc.y,
+      Std.int(bs.width), Std.int(bs.height)
     );
   }
 
