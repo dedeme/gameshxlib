@@ -17,7 +17,6 @@ class Board {
   function get_width () { return canvas.width; }
   public var height(get, never): Int;
   function get_height () { return canvas.height; }
-  var withImage = false;
 
   /// Creates a board with transparent background.
   ///   width : Board width
@@ -41,11 +40,6 @@ class Board {
 
   /// Draws a background image.
   public function drawBackground (img: ImageElement, x = 0, y = 0): Board {
-    if (withImage) {
-      canvas.getContext2d().clearRect(0, 0, width, height);
-    }
-
-    withImage = true;
     canvas.getContext2d().drawImage(
       img, 0, 0, img.width, img.height, x, y, width, height
     );
@@ -54,11 +48,6 @@ class Board {
 
   /// Draws a background image.
   public function drawBackgroundFrom (cv: CanvasElement, x = 0, y = 0): Board {
-    if (withImage) {
-      canvas.getContext2d().clearRect(0, 0, width, height);
-    }
-
-    withImage = true;
     canvas.getContext2d().drawImage(
       cv, 0, 0, cv.width, cv.height,
       x, y, cv.width, cv.height
@@ -69,7 +58,6 @@ class Board {
   /// Clears background image.
   public function clearBackground (): Board {
     canvas.getContext2d().clearRect(0, 0, width, height);
-    withImage = false;
     return this;
   }
 

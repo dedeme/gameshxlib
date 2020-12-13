@@ -42,7 +42,7 @@ class Main {
       Std.int(p.y / 26) * 26
     );
 
-    bd.copyBackground(bd2, xy.x, xy.y);
+    bd.copyBackground(bd2.clearBackground(), xy.x, xy.y);
   }
   public static function start (): Void {
     final i = cast(img.e, ImageElement);
