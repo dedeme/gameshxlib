@@ -84,4 +84,22 @@ class Store {
     return keys().map(e -> get(e));
   }
 
+  /// Tries 'fn' with 'get(key)'. If 'get(key)' is 'None' or 'fn' throws an
+  /// exception, returns 'value'.
+  ///   key  : Key to read.
+  ///   fn   : Function to run with the result of 'get(key)'.
+  ///   value: Default value if key does not exist or 'fn' fail.
+  public static function oget <T> (
+    key: String, fn: String -> T, value: T
+  ): T {
+    try {
+      switch (Store.get(key)) {
+        case Some(l): return fn(l);
+        case None: return value;
+      }
+    } catch (e) {
+      return value;
+    }
+  }
+
 }

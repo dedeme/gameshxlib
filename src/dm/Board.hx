@@ -32,61 +32,144 @@ class Board {
     wg.appendChild(canvas);
   }
 
-  /// Set background type "#408060".
+  /// Set background color and returns 'this'.
+  ///   value: Color type "#408060".
   public function setBackground (value: String): Board {
     wg.style.background = value;
     return this;
   }
 
-  /// Draws a background image.
-  public function drawBackground (img: ImageElement, x = 0, y = 0): Board {
-    canvas.getContext2d().drawImage(
-      img, 0, 0, img.width, img.height, x, y, width, height
-    );
+  /// Draws a loaded image and returns 'this'.
+  ///   img: Image to draw. If it has not loaded yet, nothing will be drawed.
+  ///   ix : Image left coordinate.
+  ///   iy : Image top coordinate.
+  ///   iw : Image width coordinate.
+  ///   ih : Image height coordinate.
+  ///   bx : Board left coordinate.
+  ///   by : Board top coordinate.
+  ///   bw : Board width coordinate.
+  ///   bh : Board height coordinate.
+  public function drawImage(
+    img: ImageElement, ix: Int, iy: Int, iw: Int, ih: Int,
+    bx: Int, by: Int, bw: Int, bh: Int
+  ): Board {
+    canvas.getContext2d().drawImage(img, ix, iy, iw, ih, bx, by, bw, bh);
     return this;
   }
 
-  /// Draws a background image.
-  public function drawBackgroundFrom (cv: CanvasElement, x = 0, y = 0): Board {
-    canvas.getContext2d().drawImage(
-      cv, 0, 0, cv.width, cv.height,
-      x, y, cv.width, cv.height
+  /// Draws a loaded image at x, y and returns 'this'. The image will not
+  /// be streched.
+  ///   img: Image to draw. If it has not loaded yet, nothing will be drawed.
+  ///   x  : Board left coordinate.
+  ///   y  : Board top coordinate.
+  public function copyImage (img: ImageElement, x: Int, y: Int): Board {
+    return drawImage(
+      img, 0, 0, img.width, img.height, x, y, img.width, img.height
     );
+  }
+
+  /// Draws a image, streching it if dimensions of 'this' and 'canvas'
+  /// are not equals.
+  /// It returns 'this'.
+  ///   img: Image to draw. If it has not loaded yet, nothing will be drawed.
+  public function coverImage (img: ImageElement): Board {
+    return drawImage(img, 0, 0, img.width, img.height, 0, 0, width, height);
+  }
+
+  /// Draws a canvas and returns 'this'.
+  ///   cvs: Canvas to draw.
+  ///   cx : Canvas left coordinate.
+  ///   cy : Canvas top coordinate.
+  ///   cw : Canvas width coordinate.
+  ///   ch : Canvas height coordinate.
+  ///   bx : Board left coordinate.
+  ///   by : Board top coordinate.
+  ///   bw : Board width coordinate.
+  ///   bh : Board height coordinate.
+  public function drawCanvas(
+    cvs: CanvasElement, cx: Int, cy: Int, cw: Int, ch: Int,
+    bx: Int, by: Int, bw: Int, bh: Int
+  ): Board {
+    canvas.getContext2d().drawImage(cvs, cx, cy, cw, ch, bx, by, bw, bh);
     return this;
   }
 
-  /// Clears background image.
-  public function clearBackground (): Board {
+  /// Draws a canvas at x, y and returns 'this'. The image will not
+  /// be streched.
+  ///   cvs: Canvas to draw.
+  ///   x  : Board left coordinate.
+  ///   y  : Board top coordinate.
+  public function copyCanvas (cvs: CanvasElement, x: Int, y: Int): Board {
+    return drawCanvas(
+      cvs, 0, 0, cvs.width, cvs.height,
+      x, y, cvs.width, cvs.height
+    );
+  }
+
+  /// Draws a canvas, streching its image if dimensions of 'this' and 'canvas'
+  /// are not equals.
+  /// It returns 'this'.
+  ///   cvs: Canvas to draw.
+  public function coverCanvas (cvs: CanvasElement): Board {
+    return drawCanvas(
+      cvs, 0, 0, cvs.width, cvs.height, 0, 0, width, height
+    );
+  }
+
+  /// Draws from other Board and returns 'this'.
+  ///   other: Board to draw.
+  ///   ox   : 'other' board left coordinate.
+  ///   oy   : 'other' top coordinate.
+  ///   ow   : 'other' width coordinate.
+  ///   oh   : 'other' height coordinate.
+  ///   x    : 'this' left coordinate.
+  ///   y    : 'this' top coordinate.
+  ///   w    : 'this' width coordinate.
+  ///   h    : 'this' height coordinate.
+  public function drawFrom(
+    other: Board, ox: Int, oy: Int, ow: Int, oh: Int,
+    x: Int, y: Int, w: Int, h: Int
+  ): Board {
+    return drawCanvas(other.canvas, ox, oy, ow, oh, x, y, w, h);
+  }
+
+  /// Draws from other Board at x, y and returns 'this'. The image will not
+  /// be streched.
+  ///   other: Board to draw.
+  ///   x    : 'this' left coordinate.
+  ///   y    : 'this' top coordinate.
+  public function copyFrom (other: Board, x: Int, y: Int): Board {
+    return copyCanvas(other.canvas, x, y);
+  }
+
+  /// Draws from other board, streching its image if dimensions of 'this' and
+  /// 'other' are not equals.
+  /// It returns 'this'.
+  ///   img: Image to draw.
+  public function coverFrom (other: Board): Board {
+    return coverCanvas(other.canvas);
+  }
+
+  /// Clears 'this' and returns it.
+  public function clear (): Board {
     canvas.getContext2d().clearRect(0, 0, width, height);
     return this;
   }
 
-  /// Moves background image.
-  public function moveBackground (x: Int, y: Int): Board {
-    drawBackgroundFrom(cutBackground(0, 0, width, height).canvas, x, y);
-    return this;
-  }
-
-  /// Copies background image.
-  public function copyBackground (board: Board, x = 0, y = 0): Board {
-    board.drawBackgroundFrom(canvas, -x, -y);
-    return this;
-  }
-
-  /// Cuts background image.
-  public function cutBackground (
+  /// Cuts 'this' image and returns a new Board with the result.
+  public function cut (
     x: Int, y: Int, width: Int, height: Int
   ): Board {
-    return new Board(width, height).drawBackgroundFrom(canvas, -x, -y);
+    return new Board(width, height).copyCanvas(canvas, -x, -y);
   }
 
-  /// Adds an image.
+  /// Adds a canvas element.
   public function addCanvas (cv: CanvasElement): Board {
     wg.appendChild(cv);
     return this;
   }
 
-  /// Removes an image.
+  /// Removes a canvas element.
   public function removeCanvas (cv: CanvasElement): Board {
     wg.removeChild(cv);
     return this;

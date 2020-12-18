@@ -42,7 +42,10 @@ class Main {
       Std.int(p.y / 26) * 26
     );
 
-    bd.copyBackground(bd2.clearBackground(), xy.x, xy.y);
+    bd2
+      .clear()
+      .copyFrom(bd, -xy.x, -xy.y)
+    ;
   }
   public static function start (): Void {
     final i = cast(img.e, ImageElement);
@@ -50,7 +53,7 @@ class Main {
     final isp2 = cast(img3.e, ImageElement);
     bd = new Board(i.width, i.height)
       .setBackground("#004980")
-      .drawBackground(i)
+      .coverImage(i)
       .addClick(click)
     ;
 
