@@ -7,6 +7,7 @@ import js.html.DragEvent;
 import js.html.MouseEvent;
 import js.html.CanvasElement;
 import js.html.ImageElement;
+import haxe.Constraints.Function;
 
 /// Canvas element draggable to use on a Board.
 class Sprite {
@@ -303,39 +304,39 @@ class Sprite {
     return this;
   }
 
-  public function addMouseDown (fn: MouseEvent -> Void): Sprite {
-    canvas.addEventListener("mousedown", fn);
-    canvas.addEventListener("touchstart", fn);
+  public function addMouseDown (fn: Function): Sprite {
+    if (Device.isMobil) canvas.addEventListener("touchstart", fn);
+    else canvas.addEventListener("mousedown", fn);
     return this;
   }
 
-  public function removeMouseDown (fn: MouseEvent -> Void): Sprite {
+  public function removeMouseDown (fn: Function): Sprite {
     canvas.removeEventListener("mousedown", fn);
-    canvas.removeEventListener("touchstart", fn);
+    if (Device.isMobil) canvas.removeEventListener("touchstart", fn);
     return this;
   }
 
-  public function addMouseUp (fn: MouseEvent -> Void): Sprite {
-    canvas.addEventListener("mouseup", fn);
-    canvas.addEventListener("touchend", fn);
+  public function addMouseUp (fn: Function): Sprite {
+    if (Device.isMobil) canvas.addEventListener("touchend", fn);
+    else canvas.addEventListener("mouseup", fn);
     return this;
   }
 
-  public function removeMouseUp (fn: MouseEvent -> Void): Sprite {
-    canvas.removeEventListener("mouseup", fn);
-    canvas.removeEventListener("touchend", fn);
+  public function removeMouseUp (fn: Function): Sprite {
+    if (Device.isMobil) canvas.removeEventListener("touchend", fn);
+    else canvas.removeEventListener("mouseup", fn);
     return this;
   }
 
-  public function addMouseMove (fn: MouseEvent -> Void): Sprite {
-    canvas.addEventListener("mousemove", fn);
-    canvas.addEventListener("touchmove", fn);
+  public function addMouseMove (fn: Function): Sprite {
+    if (Device.isMobil) canvas.addEventListener("touchmove", fn);
+    else canvas.addEventListener("mousemove", fn);
     return this;
   }
 
-  public function removeMouseMove (fn: MouseEvent -> Void): Sprite {
-    canvas.removeEventListener("mousemove", fn);
-    canvas.addEventListener("touchmove", fn);
+  public function removeMouseMove (fn: Function): Sprite {
+    if (Device.isMobil) canvas.addEventListener("touchmove", fn);
+    else canvas.removeEventListener("mousemove", fn);
     return this;
   }
 
